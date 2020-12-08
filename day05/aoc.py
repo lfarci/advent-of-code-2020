@@ -9,34 +9,22 @@ def find_middle(min, max):
     return min + math.ceil((max - min) / 2)
 
 def binary_search(selectors, lower_selector, upper_selector, min, max):
-    selector = 0
+    selector_idx = 0
     middle = find_middle(min, max)
-    while selector < len(selectors):
-        if selectors[selector] == lower_selector:
+    while selector_idx < len(selectors):
+        if selectors[selector_idx] == lower_selector:
             max = middle
-        if selectors[selector] == upper_selector:
+        if selectors[selector_idx] == upper_selector:
             min = middle
         middle = find_middle(min, max)
-        selector += 1
+        selector_idx += 1
     return min
 
 def find_row(row_selectors, min_row = 0, max_row = 127):
-    return binary_search(
-        selectors=row_selectors,
-        lower_selector='F',
-        upper_selector='B',
-        min=min_row,
-        max=max_row
-    )
+    return binary_search(row_selectors, 'F', 'B', min_row, max_row)
 
 def find_column(column_selectors, min_col = 0, max_col = 7):
-    return binary_search(
-        selectors=column_selectors,
-        lower_selector='L',
-        upper_selector='R',
-        min=min_col,
-        max=max_col
-    )
+    return binary_search(column_selectors, 'L', 'R', min_col, max_col)
 
 def seat_id(row, column, nseats_by_row = 8):
     return row * nseats_by_row + column
@@ -53,5 +41,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
