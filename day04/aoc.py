@@ -70,7 +70,7 @@ def main():
         "hcl": { "required": True, "validator": v.hcl_validator},
         "ecl": { "required": True, "validator": v.ecl_validator},
         "pid": { "required": True, "validator": v.pid_validator},
-        "cid": { "required": True, "validator": None}
+        "cid": { "required": False, "validator": None}
     }
 
     print(f"Number of valid passports: {count_valid_passports(passports, requirements)}")
