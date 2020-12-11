@@ -32,35 +32,28 @@ def read_rules_from_input(path):
     return rules
 
 def exist_way_to(root_color, target_color, rules):
-    print(f"root: {root_color} target: {target_color}")
-    if root_color == target_color:
-        print("\tFound a match")
-        return True
-    elif len(rules[root_color]) == 0:
-        print("\tEnd node")
+    if len(rules[root_color]) == 0:
         return False
     else:
         flags = []
         for color in rules[root_color]:
-            print(f"\tGoing down to {color}")
-            flags.append(exist_way_to(color, target_color, rules))
-        return any(flags)
+            if color == target_color:
+                return True
+            else:
+                flags.append(exist_way_to(color, target_color, rules))
+    return any(flags)
+
+def count_possible_bad_parent_for(child_color, rules):
+    count = 0
+    for color in rules.keys():
+        if exist_way_to(color, child_color, rules):
+            count += 1
+    return count
 
 def main():
     rules = read_rules_from_input("./input.txt")
-
-    # print(read_rule("dim tan bags contain 3 shiny teal bags, 5 bright white bags, 4 striped bronze bags."))
-
-    print(f"{exist_way_to('posh crimson', 'shiny gold', rules)}")
-
-    # count = 0
-    # for color in rules.keys():
-    #     if exist_way_to(color, 'shiny gold', rules):
-    #         count += 1
-
-    # print(f"Number of bag colors that can eventually contain at least one shiny gold bag: {count}")
-
-    # Note: 227 is too high
+    count = count_possible_bad_parent_for('shiny gold', rules)
+    print(f"Number of bag colors that can contain shiny gold bags: {count} (part 1)")
 
 if __name__ == "__main__":
     main()
