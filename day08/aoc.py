@@ -1,12 +1,9 @@
 from parse import *
+import copy
 
 def parse_instruction(line):
     parsed = parse("{} {}", line)
-    return {
-        "operation": parsed[0],
-        "argument": int(parsed[1]),
-        "executed": False
-    }
+    return {"operation": parsed[0], "argument": int(parsed[1])}
 
 def read_lines_from(path):
     with open(path, 'r') as file:
@@ -32,17 +29,40 @@ def execute(instruction, instruction_idx, accumulator = 0):
 def run(boot_code):
     index = 0
     accumulator = 0
-    while not boot_code[index]["executed"]:
+    executed = [ False ] * len(boot_code)
+    while index < len(boot_code) and not executed[index]:
         state = execute(boot_code[index], index, accumulator)
-        boot_code[index]["executed"] = True
+        executed[index] = True
         accumulator = state["accumulator"]
         index = state["next"]
     return accumulator
 
+def terminates_normally(boot_code):
+    index = 0
+    executed = [ False ] * len(boot_code)
+    while index < len(boot_code) and not executed[index]:
+        state = execute(boot_code[index], index)
+        executed[index] = True
+        index = state["next"]
+    return index == len(boot_code)
+
+def fixed(boot_code, corrupted_operations = ["jmp", "nop"]):
+    for index, instruction in enumerate(boot_code):
+        if instruction["operation"] in corrupted_operations:
+            corrupted_operation = instruction["operation"]
+            patch = "jmp" if corrupted_operation == "nop" else "nop"
+            boot_code[index]["operation"] = patch
+            if terminates_normally(boot_code):
+                fixed_boot_code = copy.deepcopy(boot_code)
+                boot_code[index]["operation"] = corrupted_operation
+                return fixed_boot_code
+            boot_code[index]["operation"] = corrupted_operation
+    return None
+
 def main():
     boot_code = read_boot_code_from("./input.txt")
-    accumulator = run(boot_code)
-    print(f"Accumulator before infinite loop: {accumulator} (part 1)")
+    print(f"Accumulator before infinite loop: {run(boot_code)} (part 1)")
+    print(f"Accumulator after fix: {run(fixed(boot_code))} (part 2)")
 
 if __name__ == "__main__":
     main()
